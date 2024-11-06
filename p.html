@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Purchase</title>
+    <link rel="stylesheet" href="./purchase.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="container"></div>
+    <div class="container" id="outer">
+        <!-- Header -->
+        <header class="top-bar">
+            <h1>Manage Purchase</h1>
+            <button class="button add-button" onclick="togglePopup()">
+                <i class="fa-solid fa-circle-plus"></i>
+                Add Purchase
+            </button>
+        </header>
+
+        <!-- Table Controls and Search -->
+        <div class="secondHeading">
+            <div class="table-controls">
+                <button class="header-btn button">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+                <button class="header-btn button">
+                    <i class="fa-solid fa-sort"></i> Sort
+                </button>
+            </div>
+            <div class="search-container">
+                <span class="search_icon">
+                    <svg width="24" height="24">...</svg>
+                </span>
+                <input id="input_data" type="text" placeholder="Search">
+            </div>
+        </div>
+
+        <!-- Product Table -->
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Purchase ID</th>
+                    <th>Supplier Name</th>
+                    <th>Purchase Date</th>
+                    <th>Purchase Time</th>
+                    <th>Total Amount</th>
+                    <th>Discount</th>
+                    <th>Final Amount</th>
+                </tr>
+            </thead>
+            <tbody id="product-list"></tbody>
+        </table>
+
+        <!-- Pop-up for Adding Purchase -->
+        <div id="popupOverlay" class="overlay-container">
+            <div class="popup-box">
+                <header class="top-bar">
+                    <h2>Add New Purchase</h2>
+                </header>
+                <form class="product-form" id="purchase_form">
+                    <!-- Form content here -->
+                    <div id="btn-container">
+                        <button class="button save-btn">Save</button>
+                        <button class="button" onclick="togglePopup()">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="purchase.js"></script>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Purchase</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .add-product-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .add-product-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .table-controls {
+            margin: 20px 0;
+        }
+
+        .table-controls button {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 15px;
+            border: none;
+            margin-right: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .table-controls button:hover {
+            background-color: #0056b3;
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 30px;
+        }
+
+        .product-table th,
+        .product-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .product-table th {
+            background-color: #f7f7f7;
+        }
+
+        .overlay-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-box {
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            width: 620px;
+            opacity: 0;
+            transform: scale(0.8);
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-left: 15px;
+        }
+
+        .input-group label {
+            margin-bottom: 5px;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 80%;
+            font-family: Arial, sans-serif;
+        }
+
+        #btn-container {
+            display: flex;
+            justify-content: center;
+            margin-left: 90px;
+        }
+
+        .save-btn {
+            padding: 6px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-left: 12px;
+        }
+
+        .save-btn:hover {
+            background-color: #218838;
+        }
+
+        /* new */
+        .product-list-container {
+            width: 60%;
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .product-list {
+            width: 100%;
+            max-height: 300px; /* Set max height for scrolling */
+            overflow-y: auto; /* Enables vertical scrolling */
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-select {
+            width: 60%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .product-quantity {
+            display: flex;
+            align-items: center;
+        }
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            padding: 5px;
+            margin-left: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .add-button {
+            display: block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .add-button:hover {
+            background-color: #218838;
+        }
+
+        #productsContainer{
+            display:flex;
+            flex-direction:column;
+        }
+
+        #eachItem{
+            display:flex;
+            flex-direction:row;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <div class="container" id="outer">
+        <header class="top-bar">
+            <h1>Manage Purchase</h1>
+            <button class="add-product-btn" onclick="togglePopup()">
+                <i class="fa-solid fa-circle-plus"></i>
+                <div class="icon-label">Add Purchase</div>
+            </button>
+        </header>
+
+        <div class="secondHeading">
+            <div class="table-controls">
+                <button class="header-btn">
+                    <i class="fa-solid fa-filter"></i>
+                    <div class="icon-label">Filter</div>
+                </button>
+                <button class="header-btn">
+                    <i class="fa-solid fa-sort"></i>
+                    <div class="icon-label">Sort</div>
+                </button>
+            </div>
+
+            <div class="headertab" id="searchbar">
+                <span class="search_icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <title>Search Icon</title>
+                        <path d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z" stroke="#717478" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M16 16L21 21" stroke="#717478" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                </span>
+                <span>
+                    <input id="input_data" type="text" placeholder="Search " />
+                </span>
+            </div>
+        </div>
+
+        <table class="product-table" style="margin-left:0px;">
+            <thead>
+                <tr>
+                    <th>Purchase Id</th>
+                    <th>Supplier Name</th>
+                    <th>Purchase Date</th>
+                    <th>Purchase Time</th>
+                    <th>Total Amount</th>
+                    <th>Discount</th>
+                    <th>Final Amount</th>
+                </tr>
+            </thead>
+            <tbody id="product-list">
+                <!-- Dynamic content will go here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Popup for adding new purchase -->
+    <div id="popupOverlay" class="overlay-container">
+        <div class="popup-box">
+            <div class="top-bar">
+                <header>
+                    <h2>Add New Purchase</h2>
+                </header>
+            </div>
+
+            <div class="product-form" id="purchase_form">
+                <div class="input-group">
+                    <label class="form-label" for="p_id">Purchase Id</label>
+                    <input class="form-input" type="text" id="p_id" placeholder="Enter Purchase Id">
+                </div>
+
+                <div class="input-group">
+                    <label class="form-label" for="name">Supplier Name</label>
+                    <input class="form-input" type="text" id="name" placeholder="Enter Supplier Name">
+                </div>
+
+                <div class="input-group">
+                    <label class="form-label" for="date">Purchase Date</label>
+                    <input class="form-input" type="text" id="date" placeholder="Enter Purchase Date">
+                </div>
+
+                <div class="input-group">
+                    <label class="form-label" for="time">Purchase Time</label>
+                    <input class="form-input" type="text" id="time" placeholder="Enter Purchase Time">
+                </div>
+
+                <div class="input-group">
+                    <label class="form-label" for="products">Products</label>
+                    <div id="productsContainer">
+                        <div class="product-list" id="productList">
+                            <!-- Initial product item -->
+                            <div class="product-item" id="eachItem">
+                                <select class="product-select" name="product[]" id="product1">
+                                    <option value="" disabled selected>Select product from list</option>
+                                    <option value="product-a">Product A</option>
+                                    <option value="product-b">Product B</option>
+                                    <option value="product-c">Product C</option>
+                                </select>
+                                <input type="number" placeholder="Quantity" min="1" id="quantity1" />
+                                <button type="button" class="remove-btn" onclick="removeProduct(this)">Remove</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-product-btn" onclick="addProduct()">Add Another Product</button>
+                    </div>
+                    
+                </div>
+
+                <div class="input-group">
+                    <label class="form-label" for="amount">Total Amount</label>
+                    <input class="form-input" type="number" id="amount" placeholder="Enter Total Amount">
+                </div>
+
+                <div class="input-group">
+                    <label class="form-label" for="discount">Discount</label>
+                    <input class="form-input" type="number" id="discount" placeholder="Enter Discount (%)">
+                </div>
+
+                <div class="input-group">
+                    <label class="form-label" for="final_amount">Final Amount</label>
+                    <input class="form-input" type="number" id="final_amount" placeholder="Enter Final Amount" readonly>
+                </div>
+            </div>
+
+            <div id="btn-container">
+                <button class="save-btn" onclick="savePurchase()">Save Purchase</button>
+                <button class="save-btn" onclick="togglePopup()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePopup() {
+            const overlay = document.getElementById('popupOverlay');
+            overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function addProduct() {
+            const productList = document.getElementById('productList');
+            const productCount = productList.childElementCount + 1;
+
+            const newProductItem = document.createElement('div');
+            newProductItem.classList.add('product-item');
+            newProductItem.innerHTML = `
+                <select class="product-select" name="product[]" id="product${productCount}">
+                    <option value="" disabled selected>Select product from list</option>
+                    <option value="product-a">Product A</option>
+                    <option value="product-b">Product B</option>
+                    <option value="product-c">Product C</option>
+                </select>
+                <input type="number" placeholder="Quantity" min="1" id="quantity${productCount}" />
+                <button type="button" class="remove-btn" onclick="removeProduct(this)">Remove</button>
+            `;
+            productList.appendChild(newProductItem);
+        }
+
+        function removeProduct(button) {
+            const productItem = button.parentElement;
+            productItem.remove();
+        }
+
+        function savePurchase() {
+            const purchaseId = document.getElementById('p_id').value;
+            const supplierName = document.getElementById('name').value;
+            const purchaseDate = document.getElementById('date').value;
+            const purchaseTime = document.getElementById('time').value;
+            const totalAmount = document.getElementById('amount').value;
+            const discount = document.getElementById('discount').value;
+            const finalAmount = document.getElementById('final_amount').value;
+
+            const productItems = document.querySelectorAll('.product-item');
+            const products = [];
+            productItems.forEach(item => {
+                const product = item.querySelector('select').value;
+                const quantity = item.querySelector('input[type="number"]').value;
+                products.push({ product, quantity });
+            });
+
+            // Here you can handle saving the purchase data as needed
+            console.log({
+                purchaseId,
+                supplierName,
+                purchaseDate,
+                purchaseTime,
+                products,
+                totalAmount,
+                discount,
+                finalAmount
+            });
+
+            togglePopup(); // Close the popup after saving
+        }
+    </script>
+</body>
+
+</html>
